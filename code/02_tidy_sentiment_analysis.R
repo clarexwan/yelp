@@ -44,3 +44,39 @@ top_sent %>%
   summarize(n = sum(n)) %>% 
   mutate(sentiment = reorder(sentiment, n)) %>% 
   ggplot(aes(n, sentiment, fill = sentiment)) + geom_col(show.legend = F)
+
+
+
+
+# get sentiment score for words using "syuzhet"
+sent_score <-get_sentiment(tidy_words$word)
+tidy_words$score<-sent_score
+
+# convert date to different date format 
+tidy_words$date <- as.Date(tidy_words$date)
+
+# calculate total sentiment score (adding scores of words) received by one restaurant on the same day
+tidy_words_totalscore<- tidy_words %>%
+  group_by(date,business_id)%>%
+  mutate(total_score=sum(score)) %>%
+  select(business_id,date,total_score)%>%
+  unique()%>%
+  mutate(year=substr(date, 1, 4))
+
+# calulate mean score by year
+tidy_words_totalscore <- tidy_words_totalscore%>%
+  group_by(year)%>%
+  mutate(mean_score_year=mean(total_score))
+
+# plot score and year
+ggplot(tidy_words_totalscore, aes(x = year, y = mean_score_year)) +
+  geom_point() +
+  labs(x = "Year", y = "Score") +
+  ggtitle("Score by Year")
+
+
+
+
+
+
+
