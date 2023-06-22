@@ -55,9 +55,9 @@ tidy_words$score<-sent_score
 # convert date to different date format 
 tidy_words$date <- as.Date(tidy_words$date)
 
-# calculate total sentiment score (adding scores of words) received by one restaurant on the same day
+# calculate total sentiment score (adding scores of words) for each review received by one restaurant on the day
 tidy_words_totalscore<- tidy_words %>%
-  group_by(date,business_id)%>%
+  group_by(date,business_id,review_id)%>%
   mutate(total_score=sum(score)) %>%
   select(business_id,date,total_score)%>%
   unique()%>%
